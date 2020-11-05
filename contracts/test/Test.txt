@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.4;
+import "../interfaces/weth/IWETH.sol";
+contract Test{
+
+    function test()public payable{
+        string memory swapFun="swap(address,uint256,address,uint256,address)";
+        address weth=0xd0A1E359811322d97991E03f863a0C30C2cF029C;
+        address token=0x4B95E018984a05cd783F163209780bfDE8A9F7F8;
+        IWETH(weth).deposit{value: msg.value}();
+        uint256 wethAmount=133880000000000;
+        uint256 tokenAmount=1000000000000000000;
+        bytes memory params=abi.encode(weth,wethAmount,token,tokenAmount,msg.sender);
+        bytes memory callData=abi.encodePacked(bytes4(keccak256(bytes(swapFun))),params);
+        address(0xb767B3f57B5A4643429D1A5FF2b7242c38efefB5).delegatecall(callData);
+    }
+
+    function untest()public {
+        address weth=0xd0A1E359811322d97991E03f863a0C30C2cF029C;
+        IWETH(weth).withdraw(IWETH(weth).balanceOf(address(this)));
+        msg.sender.transfer(address(this).balance);
+    }
+}
