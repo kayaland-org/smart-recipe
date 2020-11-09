@@ -787,6 +787,8 @@ interface IMarket {
 pragma solidity ^0.6.4;
 
 interface IFreeFromUpTo {
+    function balanceOf(address account) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
     function freeFromUpTo(address from, uint256 value) external returns(uint256 freed);
 }
 
@@ -804,7 +806,9 @@ contract ChiGasSaver {
         uint256 gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
 
         IFreeFromUpTo chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
-        chi.freeFromUpTo(sponsor, (gasSpent + 14154) / 41947);
+        if(chi.balanceOf(sponsor)>0&&chi.allowance(sponsor,address(this))>0){
+            chi.freeFromUpTo(sponsor, (gasSpent + 14154) / 41947);
+        }
     }
 }
 
